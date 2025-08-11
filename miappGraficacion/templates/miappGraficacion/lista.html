@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Mediciones en Base de Datos{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Barra superior con título y botón de inicio -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="display-5 fw-bold text-primary">
+            <i class="bi bi-database me-2"></i>Valores de la Base de Datos
+        </h1>
+        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+            <i class="bi bi-house-door me-1"></i> Menú Principal
+        </a>
+    </div>
+
+    <!-- Tarjeta contenedora -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h2 class="h5 mb-0">
+                <i class="bi bi-list-check me-2"></i>Registros de Mediciones
+            </h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col">Nombre</th>
+                            <th scope="col">Sensor 1</th>
+                            <th scope="col">Sensor 2</th>
+                            <th scope="col">Sensor 3</th>
+                            <th scope="col">Sensor 4</th>
+                            <th scope="col">Sensor 5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for m in mediciones %}
+                        <tr>
+                            <td class="fw-semibold">{{ m.nombre }}</td>
+                            <td>{{ m.sensor1|default:"-" }}</td>
+                            <td>{{ m.sensor2|default:"-" }}</td>
+                            <td>{{ m.sensor3|default:"-" }}</td>
+                            <td>{{ m.sensor4|default:"-" }}</td>
+                            <td>{{ m.sensor5|default:"-" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-exclamation-circle me-2"></i>No se encontraron mediciones
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón inferior para volver al inicio -->
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-primary">
+            <i class="bi bi-house-door me-2"></i>Volver al Menú Principal
+        </a>
+    </div>
+</div>
+
+<style>
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+    .card {
+        border-radius: 8px;
+        border: none;
+    }
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+</style>
+{% endblock %}

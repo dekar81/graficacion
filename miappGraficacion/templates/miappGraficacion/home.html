@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Menú Principal{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Encabezado principal con tamaño aumentado -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-10 text-center">
+            <h1 class="display-3 fw-bold mb-4">
+                <i class="bi bi-speedometer2 me-3"></i>SISTEMA DE ANÁLISIS DE DATOS
+            </h1>
+            <p class="lead fs-2 mb-4 text-muted">Selecciona una opción del menú para comenzar</p>
+        </div>
+    </div>
+    
+    <!-- Tarjetas de opciones con texto más grande -->
+    <div class="row g-4 justify-content-center">
+        {% for item in menu_items %}
+        {% if item.url != 'seleccion_csv' %}  <!-- Excluye la opción de subir archivos -->
+        <div class="col-xl-4 col-md-6">
+            <a href="{% url item.url %}" class="card h-100 text-decoration-none hover-zoom" style="min-height: 250px;">
+                <div class="card-body text-center p-4 d-flex flex-column">
+                    <div class="icon-xxl bg-primary bg-opacity-10 text-primary rounded-circle mb-4 mx-auto">
+                        <i class="bi {{ item.icono }} fs-1"></i>
+                    </div>
+                    <h2 class="h3 fw-bold mb-3">{{ item.nombre }}</h2>
+                    <p class="fs-5 text-muted mb-auto">{{ item.descripcion }}</p>
+                    <div class="mt-3">
+                        <span class="btn btn-lg btn-outline-primary fs-5 px-4">
+                            Acceder <i class="bi bi-arrow-right ms-2"></i>
+                        </span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    
+    <!-- Sección de ayuda con texto aumentado -->
+    <div class="row justify-content-center mt-6">
+        <div class="col-lg-8">
+            <div class="card border-0 bg-light mt-5">
+                <div class="card-body text-center p-5">
+                    <h2 class="display-5 mb-4">¿Necesitas ayuda?</h2>
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="#" class="btn btn-outline-secondary btn-lg px-4 fs-4">
+                            <i class="bi bi-question-circle me-2"></i> Guía de usuario
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary btn-lg px-4 fs-4">
+                            <i class="bi bi-envelope me-2"></i> Soporte técnico
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Estilos personalizados para tamaño aumentado */
+    .hover-zoom {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-zoom:hover {
+        transform: scale(1.03);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    .icon-xxl {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+    }
+    .display-3 {
+        font-size: 4rem;
+        letter-spacing: -0.5px;
+    }
+    .lead.fs-2 {
+        font-size: 2rem;
+    }
+    .fs-5 {
+        font-size: 1.25rem;
+    }
+    .mt-6 {
+        margin-top: 5rem;
+    }
+    @media (max-width: 768px) {
+        .display-3 {
+            font-size: 2.5rem;
+        }
+        .lead.fs-2 {
+            font-size: 1.5rem;
+        }
+        .icon-xxl {
+            width: 70px;
+            height: 70px;
+            font-size: 2rem;
+        }
+    }
+</style>
+{% endblock %}

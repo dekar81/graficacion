@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Selección de CSV{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barra de navegación superior -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+            <i class="bi bi-house-door me-2"></i>Menú Principal
+        </a>
+        <h2 class="mb-0">Selección de archivo CSV</h2>
+        <div></div> <!-- Espaciador para alinear el título al centro -->
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h3 class="mb-0"><i class="bi bi-file-earmark-spreadsheet me-2"></i>Seleccione el archivo CSV a visualizar</h3>
+        </div>
+        <div class="card-body">
+            <form method="GET" action="{% url 'graficas' %}">
+                <div class="mb-4">
+                    <label for="archivo" class="form-label fs-5">
+                        <i class="bi bi-folder me-2"></i>Archivos disponibles:
+                    </label>
+                    <select class="form-select form-select-lg" id="archivo" name="archivo" required>
+                        {% for archivo in archivos_csv %}
+                        <option value="{{ archivo }}">{{ archivo }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-text mt-2">
+                        <i class="bi bi-info-circle me-1"></i>Seleccione un archivo para generar las gráficas
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-graph-up me-2"></i>Visualizar Gráficas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botón adicional para volver al inicio -->
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-house-door me-2"></i>Volver al Menú Principal
+        </a>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .form-select-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1.1rem;
+    }
+    .card-header {
+        padding: 1.2rem 1.5rem;
+    }
+</style>
+{% endblock %}

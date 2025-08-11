@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Subir archivo CSV{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Barra de navegación superior -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-primary">
+            <i class="bi bi-house-door me-2"></i> Menú Principal
+        </a>
+        <h2 class="mb-0">Subir archivos CSV</h2>
+        <div></div> <!-- Espaciador para alinear el título al centro -->
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0"><i class="bi bi-file-earmark-spreadsheet me-2"></i> Cargar nuevo archivo</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="id_archivo_csv" class="form-label fs-5">
+                                <i class="bi bi-file-arrow-up me-2"></i>{{ form.archivo_csv.label }}
+                            </label>
+                            {{ form.archivo_csv }}
+                            <div class="form-text mt-2">
+                                <i class="bi bi-info-circle me-1"></i>{{ form.archivo_csv.help_text }}
+                            </div>
+                            {% if form.archivo_csv.errors %}
+                                <div class="invalid-feedback d-block mt-2">
+                                    {{ form.archivo_csv.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg px-4">
+                                <i class="bi bi-upload me-2"></i>Subir y Graficar
+                            </button>
+                        </div>
+                    </form>
+                    
+                    {% if archivos_existentes %}
+                    <hr class="my-4">
+                    <div class="mt-4">
+                        <h5 class="mb-3"><i class="bi bi-folder me-2"></i>Archivos disponibles:</h5>
+                        <div class="list-group">
+                            {% for archivo in archivos_existentes %}
+                            <a href="{% url 'graficas' %}?archivo={{ archivo }}" 
+                               class="list-group-item list-group-item-action d-flex justify-content-between align-items-center py-3 hover-zoom">
+                                <span class="fw-bold">{{ archivo }}</span>
+                                <span class="badge bg-primary rounded-pill px-3 py-2">
+                                    <i class="bi bi-graph-up me-1"></i> Ver gráficas
+                                </span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón adicional para volver al inicio -->
+    <div class="text-center mt-4">
+        <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4">
+            <i class="bi bi-house-door me-2"></i> Volver al Menú Principal
+        </a>
+    </div>
+</div>
+
+<style>
+    .card {
+        border-radius: 10px;
+        border: none;
+    }
+    .hover-zoom {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-zoom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .list-group-item {
+        border-left: none;
+        border-right: none;
+    }
+    .list-group-item:first-child {
+        border-top: none;
+    }
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+</style>
+{% endblock %}
