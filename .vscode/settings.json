@@ -1,0 +1,5 @@
+{
+    "python.analysis.extraPaths": [
+        "./descarga_app/miApp"
+    ]
+}
