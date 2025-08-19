@@ -22,8 +22,9 @@ CSRF_TRUSTED_ORIGINS = [
     '137.184.62.36',              # Opcional: Permite cualquier subdominio ngrok
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-# Application definition
+CORS_ALLOWED_ORIGINS = [
+    "http://137.184.62.36",  # Tu IP
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -123,3 +124,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'miappGraficacion/static')]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/') # Ruta para archivos estáticos en producción
+# Seguridad mínima (recomendado incluso en config básica)
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+# Desactiva SSL si no usas HTTPS (el Arduino usa HTTP)
+SECURE_SSL_REDIRECT = False  # Ya que tu Arduino manda HTTP
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
