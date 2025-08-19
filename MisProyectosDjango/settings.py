@@ -16,15 +16,17 @@ SECRET_KEY = 'django-insecure-u$nrfcd*v#yw-620@^ql33087u)$w-(uf0t$eh%5k%ruqd^y8_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['137.184.62.36'] # Cambia '*' por tu dominio o IP en producción
+ALLOWED_HOSTS = [
+    '137.184.62.36',
+    'localhost',
+]
 
 CSRF_TRUSTED_ORIGINS = [
-    '137.184.62.36',              # Opcional: Permite cualquier subdominio ngrok
+    "http://137.184.62.36",
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    "http://137.184.62.36",  # Tu IP
-]
+# Configuración CORS y CSRF para Arduino
+CORS_ALLOW_ALL_ORIGINS = True  # Solo para desarrollo/pruebas (permite cualquier origen)
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -125,9 +127,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/') # Ruta para archivos estáticos en producción
 # Seguridad mínima (recomendado incluso en config básica)
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-# Desactiva SSL si no usas HTTPS (el Arduino usa HTTP)
+CSRF_COOKIE_SECURE = False  # Si usas HTTP (no HTTPS)
+CSRF_USE_SESSIONS = False  # Opcional
 SECURE_SSL_REDIRECT = False  # Ya que tu Arduino manda HTTP
 SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+
