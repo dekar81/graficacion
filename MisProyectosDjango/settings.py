@@ -19,7 +19,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['137.184.62.36'] # Cambia '*' por tu dominio o IP en producción
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.ngrok-free.app',              # Opcional: Permite cualquier subdominio ngrok
+    '137.184.62.36',              # Opcional: Permite cualquier subdominio ngrok
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
