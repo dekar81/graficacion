@@ -26,6 +26,13 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Medicion
 from .serializers import MedicionSerializer
+#librerias agregadas para aceptar conexiones arduino desde el servidor
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from django.views.decorators.csrf import csrf_exempt
+
+
 
 #Pagina de inicio de prueba con enlaces
 
@@ -369,10 +376,16 @@ def graficas(request):
     return seleccion_csv(request)
 #Fin de la vista de graficas
 
-##vusta para manejar datos enviados por arduino
+##vista para manejar datos enviados por arduino
 @api_view(['POST'])
+@csrf_exempt  # ⚠️ Desactiva CSRF (necesario para Arduino)
 def recibir_datos_arduino(request):
     if request.method == 'POST':
+        # Verificación opcional por dirección IP (si conoces tu IP pública fija)
+        client_ip = request.META.get('REMOTE_ADDR')
+        # Si quieres registrar las IPs que acceden (opcional)
+        print(f"Petición recibida desde IP: {client_ip}")
+
         serializer = MedicionSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
