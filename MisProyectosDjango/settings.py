@@ -17,12 +17,12 @@ SECRET_KEY = 'django-insecure-u$nrfcd*v#yw-620@^ql33087u)$w-(uf0t$eh%5k%ruqd^y8_
 DEBUG = False
 
 ALLOWED_HOSTS = [
-    '137.184.62.36',
+    '167.172.207.114',
     'localhost',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://137.184.62.36",
+    "http://167.172.207.114",
 ]
 
 # Configuración CORS y CSRF para Arduino
