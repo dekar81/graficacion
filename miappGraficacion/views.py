@@ -88,6 +88,9 @@ def import_csv(request):
                     sensor3=float(row['dato3']),
                     sensor4=float(row['dato4']),
                     sensor5=float(row['dato5'])
+                    sensor6=float(row['dato6'])
+                    sensor7=float(row['dato7'])
+                    sensor8=float(row['dato8'])
                 )
         
         return HttpResponse("Datos importados exitosamente")
@@ -109,7 +112,7 @@ class MedicionListView(ListView):
         
         # Filtros numéricos para cada sensor
         sensor_filters = {}
-        for sensor in ['sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5']:
+        for sensor in ['sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5', 'sensor6', 'sensor7', 'sensor8']:
             min_val = self.request.GET.get(f'{sensor}_min')
             max_val = self.request.GET.get(f'{sensor}_max')
             
@@ -136,7 +139,7 @@ class MedicionListView(ListView):
         context['nombre_sensor'] = self.request.GET.get('nombre_sensor', '')
         
         # Agregar los valores mínimos/máximos actuales para cada sensor
-        for sensor in ['sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5']:
+        for sensor in ['sensor1', 'sensor2', 'sensor3', 'sensor4', 'sensor5', 'sensor6', 'sensor7', 'sensor8']:
             context[f'{sensor}_min'] = self.request.GET.get(f'{sensor}_min', '')
             context[f'{sensor}_max'] = self.request.GET.get(f'{sensor}_max', '')
         
