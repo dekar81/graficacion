@@ -32,6 +32,9 @@
                             <th scope="col">Sensor 3</th>
                             <th scope="col">Sensor 4</th>
                             <th scope="col">Sensor 5</th>
+                            <th scope="col">Sensor 6</th>
+                            <th scope="col">Sensor 7</th>
+                            <th scope="col">Sensor 8</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,10 +46,13 @@
                             <td>{{ m.sensor3|default:"-" }}</td>
                             <td>{{ m.sensor4|default:"-" }}</td>
                             <td>{{ m.sensor5|default:"-" }}</td>
+                            <td>{{ m.sensor6|default:"-" }}</td>
+                            <td>{{ m.sensor7|default:"-" }}</td>
+                            <td>{{ m.sensor8|default:"-" }}</td>
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-4">
+                            <td colspan="9" class="text-center text-muted py-4">
                                 <i class="bi bi-exclamation-circle me-2"></i>No se encontraron mediciones
                             </td>
                         </tr>
