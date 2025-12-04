@@ -1,41 +1,36 @@
-#librerias necesarias
+# librerias necesarias
 import random
 import seaborn as sns
 import pandas as pd
 import numpy as np
-from django.shortcuts import render, redirect, HttpResponse
-from miappGraficacion.models import Medicion
 import csv
 import os
 import matplotlib
+matplotlib.use('Agg')  # Configura el backend ANTES de pyplot
 import matplotlib.pyplot as plt
 from io import BytesIO
-matplotlib.use('Agg')  # Configura el backend antes de importar pyplot
 import base64
-from .models import Medicion
-from .forms import CSVUploadForm
+
+from django.shortcuts import render, redirect, HttpResponse
 from django.conf import settings
 from django.urls import reverse
-from django.shortcuts import redirect
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.views.generic import ListView
-#librerias para manejar datos enviados por arduino
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from .models import Medicion
-from .serializers import MedicionSerializer
-#librerias agregadas para aceptar conexiones arduino desde el servidor
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 
+# Rest Framework
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+# Locales
+from .models import Medicion
+from .forms import CSVUploadForm
+from .serializers import MedicionSerializer
 
 
-#Pagina de inicio de prueba con enlaces
-
+# Pagina de inicio de prueba con enlaces
 def home(request):
     menu_items = [
         {
@@ -71,31 +66,36 @@ def home(request):
     ]
     return render(request, 'miappGraficacion/home.html', {'menu_items': menu_items})
 
-#nueva pagina de inicio
 
-#agregar valores a la base de datos, se puede usar para pruebas
+# agregar valores a la base de datos, se puede usar para pruebas
 def import_csv(request):
     if request.method == 'GET':
         file_path = 'miappGraficacion/static/miappGraficacion/data/dekar.csv' 
         
-        with open(file_path, 'r') as file:
-            reader = csv.DictReader(file)
-            for row in reader:
-                Medicion.objects.create(
-                    nombre_fecha_hora=row['nombre_fecha_hora'],
-                    sensor1=float(row['dato1']),
-                    sensor2=float(row['dato2']),
-                    sensor3=float(row['dato3']),
-                    sensor4=float(row['dato4']),
-                    sensor5=float(row['dato5'])
-                    sensor6=float(row['dato6'])
-                    sensor7=float(row['dato7'])
-                    sensor8=float(row['dato8'])
-                )
-        
-        return HttpResponse("Datos importados exitosamente")
+        try:
+            with open(file_path, 'r') as file:
+                reader = csv.DictReader(file)
+                for row in reader:
+                    Medicion.objects.create(
+                        nombre_fecha_hora=row['nombre_fecha_hora'],
+                        sensor1=float(row['dato1']),
+                        sensor2=float(row['dato2']),
+                        sensor3=float(row['dato3']),
+                        sensor4=float(row['dato4']),
+                        sensor5=float(row['dato5']),
+                        sensor6=float(row['dato6']),
+                        sensor7=float(row['dato7']),
+                        sensor8=float(row['dato8'])
+                    )
+            
+            return HttpResponse("Datos importados exitosamente")
+        except FileNotFoundError:
+            return HttpResponse("Archivo no encontrado", status=404)
+        except Exception as e:
+            return HttpResponse(f"Error: {str(e)}", status=500)
 
-#Selecciona datos en la base de datos
+
+# Selecciona datos en la base de datos
 class MedicionListView(ListView):
     model = Medicion
     template_name = 'miappGraficacion/medicion_list.html'
@@ -144,17 +144,19 @@ class MedicionListView(ListView):
             context[f'{sensor}_max'] = self.request.GET.get(f'{sensor}_max', '')
         
         return context
-#Fin de funcion para seleccionar datos en la base de datos
+# Fin de funcion para seleccionar datos en la base de datos
 
-#Muestra todos los datos que tiene la BD
+
+# Muestra todos los datos que tiene la BD
 def lista_mediciones(request):
     # Esta vista muestra una lista de todas las mediciones almacenadas en la base de datos  
     # Obtener todos los registros
     mediciones = Medicion.objects.all()
     return render(request, 'miappGraficacion/lista.html', {'mediciones': mediciones})
-#Fin de funcion para mostrar todos los datos en la BD
+# Fin de funcion para mostrar todos los datos en la BD
 
-###funcion para subir archivos CSV
+
+# funcion para subir archivos CSV
 def seleccion_csv(request):
     if request.method == 'POST':
         form = CSVUploadForm(request.POST, request.FILES)
@@ -181,13 +183,18 @@ def seleccion_csv(request):
         'form': form,
         'archivos_existentes': archivos_existentes
     })
-##fin de la funcion para subir archivos CSV
+# fin de la funcion para subir archivos CSV
+
 
 # Vista para graficas
 def graficas(request):
     if request.method == 'GET' and 'archivo' in request.GET:
         archivo_seleccionado = request.GET['archivo']
         csv_path = os.path.join(os.path.dirname(__file__), 'static', 'miappGraficacion', 'data', archivo_seleccionado)
+        
+        # Verificar si el archivo existe
+        if not os.path.exists(csv_path):
+            return redirect('seleccion_csv')
         
         # Leer datos del CSV
         datos = {}
@@ -348,20 +355,73 @@ def graficas(request):
                     print(f"Error al graficar columna {campo}: {e}")
 
         # =========================================================================
-        # 4. GRÁFICAS DE CALOR (HEATMAPS)
+        # 4. GRÁFICAS DE CALOR (HEATMAPS) - VERSIÓN MEJORADA
         # =========================================================================
-        numeric_cols = [campo for campo in campos if pd.api.types.is_numeric_dtype(df[campo])]
+        try:
+            if len(campos) > 1 and num_filas > 0:
+                numeric_cols = [campo for campo in campos if pd.api.types.is_numeric_dtype(df[campo])]
+                
+                if len(numeric_cols) > 1:
+                    # Preparar datos para heatmap
+                    heatmap_data = df[numeric_cols].corr()
+                    
+                    plt.figure(figsize=(10, 8))
+                    sns.heatmap(heatmap_data, annot=True, cmap='coolwarm', center=0,
+                               square=True, linewidths=1, cbar_kws={"shrink": 0.8})
+                    
+                    plt.title(f'Matriz de Correlación - {archivo_seleccionado}')
+                    plt.tight_layout()
+                    
+                    buffer = BytesIO()
+                    plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+                    buffer.seek(0)
+                    graficas_base64['heatmap'] = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                    plt.close()
+                    
+                    # Heatmap de valores (si no son demasiados datos)
+                    if num_filas <= 100 and len(numeric_cols) <= 10:
+                        plt.figure(figsize=(12, 8))
+                        sns.heatmap(df[numeric_cols].head(50).T, cmap='viridis', 
+                                   annot=True if len(numeric_cols) <= 5 else False,
+                                   linewidths=0.5)
+                        plt.title(f'Valores de Sensores (Primeros 50 registros) - {archivo_seleccionado}')
+                        plt.xlabel('Registro')
+                        plt.ylabel('Sensor')
+                        plt.tight_layout()
+                        
+                        buffer = BytesIO()
+                        plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+                        buffer.seek(0)
+                        graficas_base64['heatmap_valores'] = base64.b64encode(buffer.getvalue()).decode('utf-8')
+                        plt.close()
+        except Exception as e:
+            print(f"Error al generar heatmaps: {e}")
+
         # =========================================================================
         # PREPARAR DATOS PARA TEMPLATE
         # =========================================================================
         tabla_datos = []
         if datos and campos:
             sample_size = min(100, num_filas)
-            indices = random.sample(range(num_filas), sample_size) if num_filas > 100 else range(num_filas)
+            if num_filas > 100:
+                indices = random.sample(range(num_filas), sample_size)
+            else:
+                indices = range(num_filas)
             
             for i in indices:
                 fila = {campo: datos[campo][i] for campo in campos}
                 tabla_datos.append(fila)
+        
+        # Estadísticas resumen
+        estadisticas = {}
+        for campo in campos[1:]:
+            if campo in numeric_cols:
+                estadisticas[campo] = {
+                    'min': min(datos[campo]),
+                    'max': max(datos[campo]),
+                    'promedio': sum(datos[campo]) / len(datos[campo]),
+                    'valores_altos': len([v for v in datos[campo] if v >= 14]) if campo in valores_alto else 0
+                }
         
         context = {
             'archivo': archivo_seleccionado,
@@ -372,14 +432,16 @@ def graficas(request):
             'numeric_cols': numeric_cols,
             'num_filas': num_filas,
             'valores_alto': valores_alto,
-            'hay_valores_altos': bool(valores_alto)
+            'hay_valores_altos': bool(valores_alto),
+            'estadisticas': estadisticas
         }
         return render(request, 'miappGraficacion/graficas.html', context)
     
-    return seleccion_csv(request)
-#Fin de la vista de graficas
+    return redirect('seleccion_csv')
+# Fin de la vista de graficas
 
-##vista para manejar datos enviados por arduino
+
+# vista para manejar datos enviados por arduino
 @api_view(['POST'])
 @csrf_exempt  # ⚠️ Desactiva CSRF (necesario para Arduino)
 def recibir_datos_arduino(request):
